@@ -1,1 +1,3 @@
-# deepseek-vercel-proxy1
+# DeepSeek Proxy
+
+Vercel API for forwarding requests to DeepSeek safely.
