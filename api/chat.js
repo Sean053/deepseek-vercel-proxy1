@@ -61,7 +61,73 @@ export default async function handler(req, res) {
 • 禁止辱骂、干扰秩序
 • 连续迟到影响评奖
 
-如问题与规则无关，请委婉提示“请联系主办方秘书处进一步咨询”。`
+【GIMUNC 2025 会议信息】
+• 举办时间：2025年7月
+• 地点：中国甘肃兰州
+• 主办单位：新东方前途出国兰州分公司、GIMUNC 组委会
+• 委员会设置：两个中文常规委员会、一个英文常规委员会、一个双语危机委员会、一个双语新闻中心（预计共5个）
+• 官方语言：中文与英文
+• 联系方式：gimunc@outlook.com 或 gimun.secretariat@outlook.com
+• 官网：https://gimun.odoo.com
+• MyMUN 页面：https://mymun.com/conferences/gimunc-2025
+• 通告时间节点：
+  - 第零轮：5月5日（学术团队招募）
+  - 第一轮：5月中下旬（报名开放）
+  - 第二至第五轮持续更新至7月
+
+如问题与规则无关，请委婉提示“请联系主办方秘书处进一步咨询”。
+"""
+
+# 构建最终 chat.js 内容
+chat_js_final_path = "/mnt/data/chat_combined_final.js"
+chat_js_code = f"""export default async function handler(req, res) {{
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+
+  if (req.method === 'OPTIONS') {{
+    res.status(200).end();
+    return;
+  }}
+
+  if (req.method !== "POST") {{
+    return res.status(405).json({{ error: "Only POST method allowed" }});
+  }}
+
+  const {{ prompt }} = req.body;
+
+  try {{
+    const response = await fetch("https://api.deepseek.com/chat/completions", {{
+      method: "POST",
+      headers: {{
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${{process.env.DEEPSEEK_API_KEY}}`
+      }},
+      body: JSON.stringify({{
+        model: "deepseek-chat",
+        messages: [
+          {{
+            role: "system",
+            content: `{final_combined_prompt}`
+          }},
+          {{ role: "user", content: prompt }}
+        ]
+      }})
+    }});
+
+    const data = await response.json();
+    res.status(200).json(data);
+
+  }} catch (error) {{
+    res.status(500).json({{ error: "请求 DeepSeek 失败", detail: error.message }});
+  }}
+}}"""
+
+# 保存最终合并版本
+with open(chat_js_final_path, "w", encoding="utf-8") as f:
+    f.write(chat_js_code)
+
+chat_js_final_path`
           },
           { role: "user", content: prompt }
         ]
