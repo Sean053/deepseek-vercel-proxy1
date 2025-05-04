@@ -1,10 +1,9 @@
 export default async function handler(req, res) {
-  // ✅ 添加跨域响应头
+  // ✅ 添加 CORS
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
 
-  // ✅ 处理预检请求（OPTIONS）
   if (req.method === 'OPTIONS') {
     res.status(200).end();
     return;
@@ -17,7 +16,7 @@ export default async function handler(req, res) {
   const { prompt } = req.body;
 
   try {
-    const response = await fetch("https://api.deepseek.com/v1/chat", {
+    const response = await fetch("https://api.deepseek.com/chat/completions", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -36,6 +35,6 @@ export default async function handler(req, res) {
     res.status(200).json(data);
 
   } catch (error) {
-    res.status(500).json({ error: "请求 DeepSeek API 失败", detail: error.message });
+    res.status(500).json({ error: "请求 DeepSeek 失败", detail: error.message });
   }
 }
