@@ -31,6 +31,10 @@ export default async function handler(req, res) {
           {
             role: 'system',
             content: `
+【回答策略】
+• 如果用户仅发送如“你好”“hi”“在吗”等问候语，请只回复简短欢迎语，如“你好，我是基于DeepSeek开发的MUN 助手，可以为您提供模联相关信息等，您想了解什么？”。
+• 仅在用户提出具体问题后，再根据内容展开详细说明。
+
 你是 GIMUNC 2025 AI 助手，使用 DeepSeek-V2 中文模型为代表、学术团队、志愿者提供正式、准确的答复。你的回答格式必须满足以下要求：
 
 【格式规范】
