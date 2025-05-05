@@ -1,31 +1,35 @@
 export default async function handler(req, res) {
+  // Set CORS headers
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
 
+  // Handle preflight requests
   if (req.method === 'OPTIONS') {
     res.status(200).end();
     return;
   }
 
-  if (req.method !== "POST") {
-    return res.status(405).json({ error: "Only POST method allowed" });
+  // Allow only POST requests
+  if (req.method !== 'POST') {
+    return res.status(405).json({ error: 'Only POST method allowed' });
   }
 
   const { prompt } = req.body;
 
   try {
-    const response = await fetch("https://api.deepseek.com/chat/completions", {
-      method: "POST",
+    // Make a request to the DeepSeek API
+    const response = await fetch('https://api.deepseek.com/chat/completions', {
+      method: 'POST',
       headers: {
-        "Content-Type": "application/json",
-        "Authorization": `Bearer ${process.env.DEEPSEEK_API_KEY}`
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${process.env.DEEPSEEK_API_KEY}`,
       },
       body: JSON.stringify({
-        model: "deepseek-chat",
+        model: 'deepseek-chat',
         messages: [
           {
-            role: "system",
+            role: 'system',
             content: `
 你是 GIMUNC 2025 AI 助手，使用 DeepSeek-V2 中文模型为代表、学术团队、志愿者提供正式、准确的答复。你的回答格式必须满足以下要求：
 
@@ -54,18 +58,18 @@ export default async function handler(req, res) {
 
 【志愿者】
 • 志愿者基本职责（共 8 项）：
-• 答疑解惑：为代表和指导老师提供现场咨询支持。
-• 打印复印：负责各类会议资料的准备与分发。
-• 联络组委：协助沟通代表与组委会，尤其在紧急情况下。
-• 观察员引导：引导观察流程，维护秩序。
-• 布置会场：安排国家牌、主席台设备等。
-• 文件传递：传送意向条与文书，保障信息流通。
-• 维持秩序：特别是闭门磋商与投票期间的场内控制。
-• 摄影记录：会议资料与瞬间的记录与整理。
+  - 答疑解惑：为代表和指导老师提供现场咨询支持。
+  - 打印复印：负责各类会议资料的准备与分发。
+  - 联络组委：协助沟通代表与组委会，尤其在紧急情况下。
+  - 观察员引导：引导观察流程，维护秩序。
+  - 布置会场：安排国家牌、主席台设备等。
+  - 文件传递：传送意向条与文书，保障信息流通。
+  - 维持秩序：特别是闭门磋商与投票期间的场内控制。
+  - 摄影记录：会议资料与瞬间的记录与整理。
 • 注意事项：
-• 志愿者任务服从组委和主席团统一安排。
-• 着装统一（配发志愿者衣服）。
-• 志愿者应获得与会人员的尊重与理解。
+  - 志愿者任务服从组委和主席团统一安排。
+  - 着装统一（配发志愿者衣服）。
+  - 志愿者应获得与会人员的尊重与理解。
 
 【新闻中心】
 • 提交短讯与长评，经主席团审核后发布
@@ -77,7 +81,6 @@ export default async function handler(req, res) {
 • 连续迟到将影响评奖
 
 【版权保护】
-
 • 强调原创设计；
 • 未经授权禁止使用 GIMUN 设计；
 • 支持追责、依法维权。
@@ -97,16 +100,19 @@ export default async function handler(req, res) {
   - 后续通告持续更新至7月
 
 ⚠️ 如遇非规则问题，请提示用户：请联系主办方秘书处进一步咨询。
-            `.trim()
+            `.trim(),
           },
-          { role: "user", content: prompt }
-        ]
-      })
+          { role: 'user', content: prompt },
+        ],
+      }),
     });
 
     const data = await response.json();
+
+    // Respond with the data from DeepSeek API
     res.status(200).json(data);
   } catch (error) {
-    res.status(500).json({ error: "请求 DeepSeek 失败", detail: error.message });
+    // Handle errors and respond with a meaningful message
+    res.status(500).json({ error: '请求 DeepSeek 失败', detail: error.message });
   }
 }
