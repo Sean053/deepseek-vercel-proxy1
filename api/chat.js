@@ -19,16 +19,12 @@ export default async function handler(req, res) {
 
   try {
     // Make a request to the DeepSeek API
-    const response = await fetch('https://api.deepseek.com/chat/completions', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${process.env.DEEPSEEK_API_KEY}`,
-      },
-      body: JSON.stringify({
-        model: 'deepseek-chat',
-        messages: [
-          {
+    const response = await fetch("https://deepseek-gimun-proxy.sean-xuanyi.workers.dev", {
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify({ prompt: input }),
+  mode: "cors"
+});
             role: 'system',
             content: `
 【回答策略】
