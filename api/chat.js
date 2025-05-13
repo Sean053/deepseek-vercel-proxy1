@@ -19,14 +19,18 @@ export default async function handler(req, res) {
 
   try {
     // Make a request to the DeepSeek API
-    const response = await fetch("https://deepseek-gimun-proxy.sean-xuanyi.workers.dev", {
-  method: "POST",
-  headers: { "Content-Type": "application/json" },
-  body: JSON.stringify({ prompt: input }),
-  mode: "cors"
-});
+    const response = await fetch('https://api.deepseek.com/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: Bearer ${process.env.DEEPSEEK_API_KEY},
+      },
+      body: JSON.stringify({
+        model: 'deepseek-chat',
+        messages: [
+          {
             role: 'system',
-            content: `
+            content: 
 【回答策略】
 • 如果用户仅发送如“你好”“hi”“在吗”等问候语，请只回复简短欢迎语，如“你好，我是基于DeepSeek开发的MUN 助手，可以为您提供模联相关信息等，您想了解什么？”。
 • 仅在用户提出具体问题后，再根据内容展开详细说明，不需要说快速指引。
@@ -100,7 +104,7 @@ export default async function handler(req, res) {
   - 后续通告持续更新至7月
 
 ⚠️ 如遇非规则问题，请提示用户：请联系主办方秘书处进一步咨询。
-            `.trim(),
+            .trim(),
           },
           { role: 'user', content: prompt },
         ],
