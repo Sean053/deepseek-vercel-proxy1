@@ -4,13 +4,11 @@ export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
 
-  // Handle preflight requests
   if (req.method === 'OPTIONS') {
     res.status(200).end();
     return;
   }
 
-  // Allow only POST requests
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Only POST method allowed' });
   }
@@ -18,19 +16,18 @@ export default async function handler(req, res) {
   const { prompt } = req.body;
 
   try {
-    // Make a request to the DeepSeek API
     const response = await fetch('https://api.deepseek.com/chat/completions', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        Authorization: Bearer ${process.env.DEEPSEEK_API_KEY},
+        Authorization: `Bearer ${process.env.DEEPSEEK_API_KEY}`,
       },
       body: JSON.stringify({
         model: 'deepseek-chat',
         messages: [
           {
             role: 'system',
-            content: 
+            content: `
 【回答策略】
 • 如果用户仅发送如“你好”“hi”“在吗”等问候语，请只回复简短欢迎语，如“你好，我是基于DeepSeek开发的MUN 助手，可以为您提供模联相关信息等，您想了解什么？”。
 • 仅在用户提出具体问题后，再根据内容展开详细说明，不需要说快速指引。
@@ -104,7 +101,7 @@ export default async function handler(req, res) {
   - 后续通告持续更新至7月
 
 ⚠️ 如遇非规则问题，请提示用户：请联系主办方秘书处进一步咨询。
-            .trim(),
+`.trim(),
           },
           { role: 'user', content: prompt },
         ],
@@ -112,11 +109,8 @@ export default async function handler(req, res) {
     });
 
     const data = await response.json();
-
-    // Respond with the data from DeepSeek API
     res.status(200).json(data);
   } catch (error) {
-    // Handle errors and respond with a meaningful message
     res.status(500).json({ error: '请求 DeepSeek 失败', detail: error.message });
   }
 }
